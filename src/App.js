@@ -1,51 +1,52 @@
-import { useState } from 'react';
-import './App.css';
-import Expenses from './components/Expenses/Expenses';
-import AddExpense from './components/NewExpense/AddExpense';
-
+import { useEffect, useState } from "react";
+import "./App.css";
+import Expenses from "./components/Expenses/Expenses";
+import AddExpense from "./components/NewExpense/AddExpense";
 
 function App() {
+  const [expenses, setExpenses] = useState([]);
 
-  const [expenses, setExpenses] = useState([
-    {
-      id: 'e1',
-      title: 'Toilet Paper',
-      amount: 94.12,
-      date: new Date(2023, 7, 14),
-    },
-    {
-      id: 'e2',
-      title: 'New TV',
-      amount: 799.49,
-      date: new Date(2019, 2, 12)
-    },
-    {
-      id: 'e3',
-      title: 'Car Insurance',
-      amount: 294.67,
-      date: new Date(2020, 2, 28),
-    },
-    {
-      id: 'e4',
-      title: 'New Desk (Wooden)',
-      amount: 450,
-      date: new Date(2021, 5, 12),
-    },
-    {
-      id: 'e5',
-      title: 'Phone',
-      amount: 450,
-      date: new Date(2022, 5, 12),
-    },
-  ])
-  function addExpenseHandler(newData) {
-    setExpenses([...expenses, newData])
-  }
+  useEffect(() => {
+    fetchFromFirebase();
+  }, []);
 
+  const fetchFromFirebase = async () => {
+    const response = await fetch(
+      "https://expense-tracker-5deba-default-rtdb.firebaseio.com/expenses.json"
+    );
+    const data = await response.json();
+
+    const downloadExpenses = [];
+
+    for (const key in data) {
+      downloadExpenses.push({
+        id: key,
+        title: data[key].title,
+        amount: data[key].amount,
+        date: data[key].date,
+      });
+    }
+    setExpenses(downloadExpenses);
+  };
+
+  const addToFirebase = async (newData) => {
+    await fetch(
+      "https://expense-tracker-5deba-default-rtdb.firebaseio.com/expenses.json",
+      {
+        method: "POST",
+        body: JSON.stringify(newData),
+        headers: {
+          "Content-type": "application/json",
+        },
+      }
+    );
+  };
+
+  console.log(expenses);
   return (
     <div>
-      <AddExpense addExpenseHandler={addExpenseHandler}/>
-      <Expenses expenses={expenses}/>     
+      <AddExpense addExpenseHandler={addToFirebase} />
+      <Expenses expenses={expenses} />
     </div>
   );
 }

@@ -4,6 +4,7 @@ let thisYear = new Date()
 thisYear = thisYear.getFullYear()
 
 function ExpenseDate(props) {
+    console.log(props.date,'date in ExpenseDate');
     let month = props.date.toLocaleString('en-US',{month: 'long'})
     let day = props.date.toLocaleString('en-US',{day: '2-digit'})
     let year = props.date.getFullYear()
