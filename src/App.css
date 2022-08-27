@@ -8,3 +8,6 @@
   width: 330px;
   border: 1px solid;
 }
+.App h2 {
+  color: blue;
+}

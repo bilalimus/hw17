@@ -5,12 +5,14 @@ import AddExpense from "./components/NewExpense/AddExpense";
 
 function App() {
   const [expenses, setExpenses] = useState([]);
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     fetchFromFirebase();
   }, []);
 
   const fetchFromFirebase = async () => {
+    setIsLoading(true);
     const response = await fetch(
       "https://expense-tracker-5deba-default-rtdb.firebaseio.com/expenses.json"
     );
@@ -27,9 +29,11 @@ function App() {
       });
     }
     setExpenses(downloadExpenses);
+    setIsLoading(false);
   };
 
   const addToFirebase = async (newData) => {
+    setIsLoading(true);
     await fetch(
       "https://expense-tracker-5deba-default-rtdb.firebaseio.com/expenses.json",
       {
@@ -40,13 +44,24 @@ function App() {
         },
       }
     );
+    await fetchFromFirebase()
+    setIsLoading(false);
   };
+
+  let content = <h2>There are no items</h2>
+
+  if(expenses.length > 0){
+    content = <Expenses expenses={expenses} />
+  }
+  if(isLoading) {
+    content = <h2>Loading...</h2>
+  }
 
   console.log(expenses);
   return (
-    <div>
+    <div className="App">
       <AddExpense addExpenseHandler={addToFirebase} />
-      <Expenses expenses={expenses} />
+      {content}
     </div>
   );
 }
